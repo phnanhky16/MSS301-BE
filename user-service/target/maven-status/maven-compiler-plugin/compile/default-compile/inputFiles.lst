@@ -1,0 +1,9 @@
+/Users/phnanhky/Downloads/mss301-microservices/user-service/src/main/java/com/kidfavor/userservice/UserServiceApplication.java
+/Users/phnanhky/Downloads/mss301-microservices/user-service/src/main/java/com/kidfavor/userservice/controller/ShipmentController.java
+/Users/phnanhky/Downloads/mss301-microservices/user-service/src/main/java/com/kidfavor/userservice/controller/UserController.java
+/Users/phnanhky/Downloads/mss301-microservices/user-service/src/main/java/com/kidfavor/userservice/entity/Shipment.java
+/Users/phnanhky/Downloads/mss301-microservices/user-service/src/main/java/com/kidfavor/userservice/entity/User.java
+/Users/phnanhky/Downloads/mss301-microservices/user-service/src/main/java/com/kidfavor/userservice/repository/ShipmentRepository.java
+/Users/phnanhky/Downloads/mss301-microservices/user-service/src/main/java/com/kidfavor/userservice/repository/UserRepository.java
+/Users/phnanhky/Downloads/mss301-microservices/user-service/src/main/java/com/kidfavor/userservice/service/ShipmentService.java
+/Users/phnanhky/Downloads/mss301-microservices/user-service/src/main/java/com/kidfavor/userservice/service/UserService.java
