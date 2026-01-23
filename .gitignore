@@ -1,0 +1,11 @@
+git add .gitignore# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
