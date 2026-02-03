@@ -1,7 +1,10 @@
 package com.kidfavor.productservice.controller;
 
-import com.kidfavor.productservice.entity.Brand;
+import com.kidfavor.productservice.dto.request.BrandCreateRequest;
+import com.kidfavor.productservice.dto.request.BrandUpdateRequest;
+import com.kidfavor.productservice.dto.response.BrandResponse;
 import com.kidfavor.productservice.service.BrandService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +20,7 @@ public class BrandController {
     private final BrandService brandService;
     
     @GetMapping
-    public ResponseEntity<List<Brand>> getAllBrands(@RequestParam(required = false) Boolean active) {
+    public ResponseEntity<List<BrandResponse>> getAllBrands(@RequestParam(required = false) Boolean active) {
         if (active != null && active) {
             return ResponseEntity.ok(brandService.getActiveBrands());
         }
@@ -25,21 +28,21 @@ public class BrandController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<Brand> getBrandById(@PathVariable Long id) {
+    public ResponseEntity<BrandResponse> getBrandById(@PathVariable Long id) {
         return brandService.getBrandById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
     
     @PostMapping
-    public ResponseEntity<Brand> createBrand(@RequestBody Brand brand) {
-        Brand created = brandService.createBrand(brand);
+    public ResponseEntity<BrandResponse> createBrand(@Valid @RequestBody BrandCreateRequest request) {
+        BrandResponse created = brandService.createBrand(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Brand> updateBrand(@PathVariable Long id, @RequestBody Brand brand) {
-        Brand updated = brandService.updateBrand(id, brand);
+    public ResponseEntity<BrandResponse> updateBrand(@PathVariable Long id, @Valid @RequestBody BrandUpdateRequest request) {
+        BrandResponse updated = brandService.updateBrand(id, request);
         return ResponseEntity.ok(updated);
     }
     

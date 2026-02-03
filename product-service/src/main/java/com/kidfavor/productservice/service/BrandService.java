@@ -1,6 +1,10 @@
 package com.kidfavor.productservice.service;
 
+import com.kidfavor.productservice.dto.request.BrandCreateRequest;
+import com.kidfavor.productservice.dto.request.BrandUpdateRequest;
+import com.kidfavor.productservice.dto.response.BrandResponse;
 import com.kidfavor.productservice.entity.Brand;
+import com.kidfavor.productservice.mapper.BrandMapper;
 import com.kidfavor.productservice.repository.BrandRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,37 +19,41 @@ import java.util.Optional;
 public class BrandService {
     
     private final BrandRepository brandRepository;
+    private final BrandMapper brandMapper;
     
-    public List<Brand> getAllBrands() {
-        return brandRepository.findAll();
+    public List<BrandResponse> getAllBrands() {
+        List<Brand> brands = brandRepository.findAll();
+        return brandMapper.toResponseList(brands);
     }
     
-    public List<Brand> getActiveBrands() {
-        return brandRepository.findByActive(true);
+    public List<BrandResponse> getActiveBrands() {
+        List<Brand> brands = brandRepository.findByActive(true);
+        return brandMapper.toResponseList(brands);
     }
     
-    public Optional<Brand> getBrandById(Long id) {
-        return brandRepository.findById(id);
+    public Optional<BrandResponse> getBrandById(Long id) {
+        return brandRepository.findById(id)
+                .map(brandMapper::toResponse);
     }
     
-    public Optional<Brand> getBrandByName(String name) {
-        return brandRepository.findByName(name);
+    public Optional<BrandResponse> getBrandByName(String name) {
+        return brandRepository.findByName(name)
+                .map(brandMapper::toResponse);
     }
     
-    public Brand createBrand(Brand brand) {
-        return brandRepository.save(brand);
+    public BrandResponse createBrand(BrandCreateRequest request) {
+        Brand brand = brandMapper.toEntity(request);
+        Brand savedBrand = brandRepository.save(brand);
+        return brandMapper.toResponse(savedBrand);
     }
     
-    public Brand updateBrand(Long id, Brand brandDetails) {
+    public BrandResponse updateBrand(Long id, BrandUpdateRequest request) {
         Brand brand = brandRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Brand not found with id: " + id));
+                    .orElseThrow(() -> new RuntimeException("Brand not found with id: " + id));
         
-        brand.setName(brandDetails.getName());
-        brand.setDescription(brandDetails.getDescription());
-        brand.setLogoUrl(brandDetails.getLogoUrl());
-        brand.setActive(brandDetails.getActive());
-        
-        return brandRepository.save(brand);
+        brandMapper.updateEntity(brand, request);
+        Brand updatedBrand = brandRepository.save(brand);
+        return brandMapper.toResponse(updatedBrand);
     }
     
     public void deleteBrand(Long id) {

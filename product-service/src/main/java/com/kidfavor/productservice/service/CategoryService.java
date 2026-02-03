@@ -1,6 +1,10 @@
 package com.kidfavor.productservice.service;
 
+import com.kidfavor.productservice.dto.request.CategoryCreateRequest;
+import com.kidfavor.productservice.dto.request.CategoryUpdateRequest;
+import com.kidfavor.productservice.dto.response.CategoryResponse;
 import com.kidfavor.productservice.entity.Category;
+import com.kidfavor.productservice.mapper.CategoryMapper;
 import com.kidfavor.productservice.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,41 +19,46 @@ import java.util.Optional;
 public class CategoryService {
     
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
     
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public List<CategoryResponse> getAllCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        return categoryMapper.toResponseList(categories);
     }
     
-    public List<Category> getActiveCategories() {
-        return categoryRepository.findByActive(true);
+    public List<CategoryResponse> getActiveCategories() {
+        List<Category> categories = categoryRepository.findByActive(true);
+        return categoryMapper.toResponseList(categories);
     }
     
-    public Optional<Category> getCategoryById(Long id) {
-        return categoryRepository.findById(id);
+    public Optional<CategoryResponse> getCategoryById(Long id) {
+        return categoryRepository.findById(id)
+                .map(categoryMapper::toResponse);
     }
     
-    public Optional<Category> getCategoryByName(String name) {
-        return categoryRepository.findByName(name);
+    public Optional<CategoryResponse> getCategoryByName(String name) {
+        return categoryRepository.findByName(name)
+                .map(categoryMapper::toResponse);
     }
     
-    public List<Category> getSubCategories(Long parentId) {
-        return categoryRepository.findByParentId(parentId);
+    public List<CategoryResponse> getSubCategories(Long parentId) {
+        List<Category> categories = categoryRepository.findByParentId(parentId);
+        return categoryMapper.toResponseList(categories);
     }
     
-    public Category createCategory(Category category) {
-        return categoryRepository.save(category);
+    public CategoryResponse createCategory(CategoryCreateRequest request) {
+        Category category = categoryMapper.toEntity(request);
+        Category savedCategory = categoryRepository.save(category);
+        return categoryMapper.toResponse(savedCategory);
     }
     
-    public Category updateCategory(Long id, Category categoryDetails) {
+    public CategoryResponse updateCategory(Long id, CategoryUpdateRequest request) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
         
-        category.setName(categoryDetails.getName());
-        category.setDescription(categoryDetails.getDescription());
-        category.setParentId(categoryDetails.getParentId());
-        category.setActive(categoryDetails.getActive());
-        
-        return categoryRepository.save(category);
+        categoryMapper.updateEntity(category, request);
+        Category updatedCategory = categoryRepository.save(category);
+        return categoryMapper.toResponse(updatedCategory);
     }
     
     public void deleteCategory(Long id) {

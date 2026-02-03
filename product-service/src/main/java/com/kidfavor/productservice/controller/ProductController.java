@@ -1,7 +1,10 @@
 package com.kidfavor.productservice.controller;
 
-import com.kidfavor.productservice.entity.Product;
+import com.kidfavor.productservice.dto.request.ProductCreateRequest;
+import com.kidfavor.productservice.dto.request.ProductUpdateRequest;
+import com.kidfavor.productservice.dto.response.ProductResponse;
 import com.kidfavor.productservice.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +20,7 @@ public class ProductController {
     private final ProductService productService;
     
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts(@RequestParam(required = false) Boolean active) {
+    public ResponseEntity<List<ProductResponse>> getAllProducts(@RequestParam(required = false) Boolean active) {
         if (active != null && active) {
             return ResponseEntity.ok(productService.getActiveProducts());
         }
@@ -25,36 +28,36 @@ public class ProductController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         return productService.getProductById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
     
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<List<ProductResponse>> getProductsByCategory(@PathVariable Long categoryId) {
         return ResponseEntity.ok(productService.getProductsByCategory(categoryId));
     }
     
     @GetMapping("/brand/{brandId}")
-    public ResponseEntity<List<Product>> getProductsByBrand(@PathVariable Long brandId) {
+    public ResponseEntity<List<ProductResponse>> getProductsByBrand(@PathVariable Long brandId) {
         return ResponseEntity.ok(productService.getProductsByBrand(brandId));
     }
     
     @GetMapping("/search")
-    public ResponseEntity<List<Product>> searchProducts(@RequestParam String keyword) {
+    public ResponseEntity<List<ProductResponse>> searchProducts(@RequestParam String keyword) {
         return ResponseEntity.ok(productService.searchProducts(keyword));
     }
     
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        Product created = productService.createProduct(product);
+    public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductCreateRequest request) {
+        ProductResponse created = productService.createProduct(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product) {
-        Product updated = productService.updateProduct(id, product);
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductUpdateRequest request) {
+        ProductResponse updated = productService.updateProduct(id, request);
         return ResponseEntity.ok(updated);
     }
     

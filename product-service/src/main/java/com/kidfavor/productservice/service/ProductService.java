@@ -1,6 +1,14 @@
 package com.kidfavor.productservice.service;
 
+import com.kidfavor.productservice.dto.request.ProductCreateRequest;
+import com.kidfavor.productservice.dto.request.ProductUpdateRequest;
+import com.kidfavor.productservice.dto.response.ProductResponse;
+import com.kidfavor.productservice.entity.Brand;
+import com.kidfavor.productservice.entity.Category;
 import com.kidfavor.productservice.entity.Product;
+import com.kidfavor.productservice.mapper.ProductMapper;
+import com.kidfavor.productservice.repository.BrandRepository;
+import com.kidfavor.productservice.repository.CategoryRepository;
 import com.kidfavor.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,48 +23,72 @@ import java.util.Optional;
 public class ProductService {
     
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
+    private final BrandRepository brandRepository;
+    private final ProductMapper productMapper;
     
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<ProductResponse> getAllProducts() {
+        List<Product> products = productRepository.findAll();
+        return productMapper.toResponseList(products);
     }
     
-    public List<Product> getActiveProducts() {
-        return productRepository.findByActive(true);
+    public List<ProductResponse> getActiveProducts() {
+        List<Product> products = productRepository.findByActive(true);
+        return productMapper.toResponseList(products);
     }
     
-    public Optional<Product> getProductById(Long id) {
-        return productRepository.findById(id);
+    public Optional<ProductResponse> getProductById(Long id) {
+        return productRepository.findById(id)
+                .map(productMapper::toResponse);
     }
     
-    public List<Product> getProductsByCategory(Long categoryId) {
-        return productRepository.findByCategoryId(categoryId);
+    public List<ProductResponse> getProductsByCategory(Long categoryId) {
+        List<Product> products = productRepository.findByCategoryId(categoryId);
+        return productMapper.toResponseList(products);
     }
     
-    public List<Product> getProductsByBrand(Long brandId) {
-        return productRepository.findByBrandId(brandId);
+    public List<ProductResponse> getProductsByBrand(Long brandId) {
+        List<Product> products = productRepository.findByBrandId(brandId);
+        return productMapper.toResponseList(products);
     }
     
-    public List<Product> searchProducts(String keyword) {
-        return productRepository.findByNameContainingIgnoreCase(keyword);
+    public List<ProductResponse> searchProducts(String keyword) {
+        List<Product> products = productRepository.findByNameContainingIgnoreCase(keyword);
+        return productMapper.toResponseList(products);
     }
     
-    public Product createProduct(Product product) {
-        return productRepository.save(product);
+    public ProductResponse createProduct(ProductCreateRequest request) {
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found with id: " + request.getCategoryId()));
+        
+        Brand brand = brandRepository.findById(request.getBrandId())
+                .orElseThrow(() -> new RuntimeException("Brand not found with id: " + request.getBrandId()));
+        
+        Product product = productMapper.toEntity(request, category, brand);
+        Product savedProduct = productRepository.save(product);
+        return productMapper.toResponse(savedProduct);
     }
     
-    public Product updateProduct(Long id, Product productDetails) {
+    public ProductResponse updateProduct(Long id, ProductUpdateRequest request) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
         
-        product.setName(productDetails.getName());
-        product.setDescription(productDetails.getDescription());
-        product.setPrice(productDetails.getPrice());
-        product.setCategory(productDetails.getCategory());
-        product.setBrand(productDetails.getBrand());
-        product.setStock(productDetails.getStock());
-        product.setActive(productDetails.getActive());
+        Category category = null;
+        if (request.getCategoryId() != null) {
+            category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found with id: " + request.getCategoryId()));
+        }
         
-        return productRepository.save(product);
+        Brand brand = null;
+        if (request.getBrandId() != null) {
+            brand = brandRepository.findById(request.getBrandId())
+                    .orElseThrow(() -> new RuntimeException("Brand not found with id: " + request.getBrandId()));
+        }
+        
+        productMapper.updateEntity(product, request, category, brand);
+        Product updatedProduct = productRepository.save(product);
+        return productMapper.toResponse(updatedProduct);
+    }
     }
     
     public void deleteProduct(Long id) {
