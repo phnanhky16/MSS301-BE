@@ -4,6 +4,11 @@ import com.kidfavor.productservice.dto.request.ProductCreateRequest;
 import com.kidfavor.productservice.dto.request.ProductUpdateRequest;
 import com.kidfavor.productservice.dto.response.ProductResponse;
 import com.kidfavor.productservice.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,12 +20,18 @@ import java.util.List;
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
+@Tag(name = "Product", description = "Product management APIs")
 public class ProductController {
     
     private final ProductService productService;
     
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getAllProducts(@RequestParam(required = false) Boolean active) {
+    @Operation(summary = "Get all products", description = "Retrieve all products or only active products")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved products")
+    })
+    public ResponseEntity<List<ProductResponse>> getAllProducts(
+            @Parameter(description = "Filter by active status") @RequestParam(required = false) Boolean active) {
         if (active != null && active) {
             return ResponseEntity.ok(productService.getActiveProducts());
         }
@@ -28,41 +39,81 @@ public class ProductController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
+    @Operation(summary = "Get product by ID", description = "Retrieve a specific product by its ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Product found"),
+        @ApiResponse(responseCode = "404", description = "Product not found")
+    })
+    public ResponseEntity<ProductResponse> getProductById(
+            @Parameter(description = "Product ID") @PathVariable Long id) {
         return productService.getProductById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
     
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<List<ProductResponse>> getProductsByCategory(@PathVariable Long categoryId) {
+    @Operation(summary = "Get products by category", description = "Retrieve all products in a specific category")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved products")
+    })
+    public ResponseEntity<List<ProductResponse>> getProductsByCategory(
+            @Parameter(description = "Category ID") @PathVariable Long categoryId) {
         return ResponseEntity.ok(productService.getProductsByCategory(categoryId));
     }
     
     @GetMapping("/brand/{brandId}")
-    public ResponseEntity<List<ProductResponse>> getProductsByBrand(@PathVariable Long brandId) {
+    @Operation(summary = "Get products by brand", description = "Retrieve all products of a specific brand")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved products")
+    })
+    public ResponseEntity<List<ProductResponse>> getProductsByBrand(
+            @Parameter(description = "Brand ID") @PathVariable Long brandId) {
         return ResponseEntity.ok(productService.getProductsByBrand(brandId));
     }
     
     @GetMapping("/search")
-    public ResponseEntity<List<ProductResponse>> searchProducts(@RequestParam String keyword) {
+    @Operation(summary = "Search products", description = "Search products by keyword in name or description")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved products")
+    })
+    public ResponseEntity<List<ProductResponse>> searchProducts(
+            @Parameter(description = "Search keyword") @RequestParam String keyword) {
         return ResponseEntity.ok(productService.searchProducts(keyword));
     }
     
     @PostMapping
+    @Operation(summary = "Create product", description = "Create a new product")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Product created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input")
+    })
     public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductCreateRequest request) {
         ProductResponse created = productService.createProduct(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductUpdateRequest request) {
+    @Operation(summary = "Update product", description = "Update an existing product")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Product updated successfully"),
+        @ApiResponse(responseCode = "404", description = "Product not found"),
+        @ApiResponse(responseCode = "400", description = "Invalid input")
+    })
+    public ResponseEntity<ProductResponse> updateProduct(
+            @Parameter(description = "Product ID") @PathVariable Long id, 
+            @Valid @RequestBody ProductUpdateRequest request) {
         ProductResponse updated = productService.updateProduct(id, request);
         return ResponseEntity.ok(updated);
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+    @Operation(summary = "Delete product", description = "Delete a product by ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Product deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Product not found")
+    })
+    public ResponseEntity<Void> deleteProduct(
+            @Parameter(description = "Product ID") @PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
