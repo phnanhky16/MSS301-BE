@@ -1,6 +1,52 @@
 version: '3.8'
 
 services:
+  # --- API Gateway ---
+  api-gateway:
+    build:
+      context: ../api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/kidfavor
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/kidfavor/protocol/openid-connect/certs
+    depends_on:
+      - consul
+      - keycloak
+    networks:
+      - microservices-network
+
+  # --- User Service ---
+  user-service:
+    build:
+      context: ../user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-user:5432/userdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+    depends_on:
+      postgres-user:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      consul:
+        condition: service_started
+    networks:
+      - microservices-network
+    restart: on-failure
+
   # --- Service Discovery ---
   consul:
     image: hashicorp/consul:latest
@@ -26,6 +72,11 @@ services:
       - postgres-user-data:/var/lib/postgresql/data
     networks:
       - microservices-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d userdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   postgres-order:
     image: postgres:16-alpine
@@ -106,6 +157,40 @@ services:
     networks:
       - microservices-network
 
+  # --- Keycloak for Authentication ---
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    container_name: keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres-keycloak:5432/keycloak
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
+    command:
+      - start-dev
+    ports:
+      - "8180:8080"
+    depends_on:
+      - postgres-keycloak
+    networks:
+      - microservices-network
+
+  postgres-keycloak:
+    image: postgres:16-alpine
+    container_name: postgres-keycloak
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5438:5432"
+    volumes:
+      - postgres-keycloak-data:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+
   # --- Message Broker (Sửa lỗi indentation ở đây) ---
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
@@ -141,6 +226,7 @@ volumes:
   postgres-inventory-data:
   postgres-cart-data:
   postgres-review-data:
+  postgres-keycloak-data:
 
 # --- Networks Definition ---
 networks:
