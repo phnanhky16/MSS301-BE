@@ -29,12 +29,6 @@ public class BrandServiceImpl implements BrandService {
     }
     
     @Override
-    public List<BrandResponse> getActiveBrands() {
-        List<Brand> brands = brandRepository.findByActive(true);
-        return brandMapper.toResponseList(brands);
-    }
-    
-    @Override
     public Optional<BrandResponse> getBrandById(Long id) {
         return brandRepository.findById(id)
                 .map(brandMapper::toResponse);

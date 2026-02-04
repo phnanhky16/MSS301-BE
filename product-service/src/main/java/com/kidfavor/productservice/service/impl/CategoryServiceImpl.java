@@ -29,12 +29,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
     
     @Override
-    public List<CategoryResponse> getActiveCategories() {
-        List<Category> categories = categoryRepository.findByActive(true);
-        return categoryMapper.toResponseList(categories);
-    }
-    
-    @Override
     public Optional<CategoryResponse> getCategoryById(Long id) {
         return categoryRepository.findById(id)
                 .map(categoryMapper::toResponse);
@@ -44,12 +38,6 @@ public class CategoryServiceImpl implements CategoryService {
     public Optional<CategoryResponse> getCategoryByName(String name) {
         return categoryRepository.findByName(name)
                 .map(categoryMapper::toResponse);
-    }
-    
-    @Override
-    public List<CategoryResponse> getSubCategories(Long parentId) {
-        List<Category> categories = categoryRepository.findByParentId(parentId);
-        return categoryMapper.toResponseList(categories);
     }
     
     @Override

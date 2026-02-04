@@ -23,9 +23,4 @@ public class ProductUpdateRequest {
     private Long categoryId;
     
     private Long brandId;
-    
-    @Min(value = 0, message = "Stock cannot be negative")
-    private Integer stock;
-    
-    private Boolean active;
 }

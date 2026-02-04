@@ -11,8 +11,6 @@ public interface ProductService {
     
     List<ProductResponse> getAllProducts();
     
-    List<ProductResponse> getActiveProducts();
-    
     Optional<ProductResponse> getProductById(Long id);
     
     List<ProductResponse> getProductsByCategory(Long categoryId);

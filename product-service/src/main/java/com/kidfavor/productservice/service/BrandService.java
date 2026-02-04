@@ -11,8 +11,6 @@ public interface BrandService {
     
     List<BrandResponse> getAllBrands();
     
-    List<BrandResponse> getActiveBrands();
-    
     Optional<BrandResponse> getBrandById(Long id);
     
     Optional<BrandResponse> getBrandByName(String name);

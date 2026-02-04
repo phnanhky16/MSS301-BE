@@ -11,13 +11,9 @@ public interface CategoryService {
     
     List<CategoryResponse> getAllCategories();
     
-    List<CategoryResponse> getActiveCategories();
-    
     Optional<CategoryResponse> getCategoryById(Long id);
     
     Optional<CategoryResponse> getCategoryByName(String name);
-    
-    List<CategoryResponse> getSubCategories(Long parentId);
     
     CategoryResponse createCategory(CategoryCreateRequest request);
     

@@ -31,8 +31,6 @@ public class ProductMapper {
         product.setPrice(request.getPrice());
         product.setCategory(category);
         product.setBrand(brand);
-        product.setStock(request.getStock());
-        product.setActive(request.getActive());
         return product;
     }
     
@@ -52,12 +50,6 @@ public class ProductMapper {
         if (brand != null) {
             product.setBrand(brand);
         }
-        if (request.getStock() != null) {
-            product.setStock(request.getStock());
-        }
-        if (request.getActive() != null) {
-            product.setActive(request.getActive());
-        }
     }
     
     public ProductResponse toResponse(Product product) {
@@ -74,8 +66,6 @@ public class ProductMapper {
                 .price(product.getPrice())
                 .category(product.getCategory() != null ? categoryMapper.toResponse(product.getCategory()) : null)
                 .brand(product.getBrand() != null ? brandMapper.toResponse(product.getBrand()) : null)
-                .stock(product.getStock())
-                .active(product.getActive())
                 .imageUrls(imageUrls)
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())

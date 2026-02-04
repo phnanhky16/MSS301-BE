@@ -38,11 +38,7 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
     private Brand brand;
-    
-    private Integer stock = 0;
-    
-    @Column(nullable = false)
-    private Boolean active = true;
+
     
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProductImage> images;

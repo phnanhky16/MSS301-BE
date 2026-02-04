@@ -20,13 +20,9 @@ public class Brand {
     
     @Column(nullable = false, unique = true)
     private String name;
-    
-    private String description;
-    
+
     private String logoUrl;
-    
-    @Column(nullable = false)
-    private Boolean active = true;
+
     
     @OneToMany(mappedBy = "brand", fetch = FetchType.LAZY)
     private List<Product> products;

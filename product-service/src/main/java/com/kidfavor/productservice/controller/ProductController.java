@@ -26,15 +26,11 @@ public class ProductController {
     private final ProductService productService;
     
     @GetMapping
-    @Operation(summary = "Get all products", description = "Retrieve all products or only active products")
+    @Operation(summary = "Get all products", description = "Retrieve all products")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved products")
     })
-    public ResponseEntity<List<ProductResponse>> getAllProducts(
-            @Parameter(description = "Filter by active status") @RequestParam(required = false) Boolean active) {
-        if (active != null && active) {
-            return ResponseEntity.ok(productService.getActiveProducts());
-        }
+    public ResponseEntity<List<ProductResponse>> getAllProducts() {
         return ResponseEntity.ok(productService.getAllProducts());
     }
     

@@ -22,9 +22,5 @@ public class ProductImage {
     
     @Column(nullable = false)
     private String imageUrl;
-    
-    @Column(nullable = false)
-    private Boolean isPrimary = false;
-    
-    private Integer displayOrder = 0;
+
 }

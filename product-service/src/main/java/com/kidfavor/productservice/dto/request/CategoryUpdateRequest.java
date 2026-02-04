@@ -10,10 +10,4 @@ import lombok.NoArgsConstructor;
 public class CategoryUpdateRequest {
     
     private String name;
-    
-    private String description;
-    
-    private Long parentId;
-    
-    private Boolean active;
 }

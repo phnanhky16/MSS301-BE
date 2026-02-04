@@ -26,15 +26,11 @@ public class BrandController {
     private final BrandService brandService;
     
     @GetMapping
-    @Operation(summary = "Get all brands", description = "Retrieve all brands or only active brands")
+    @Operation(summary = "Get all brands", description = "Retrieve all brands")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved brands")
     })
-    public ResponseEntity<List<BrandResponse>> getAllBrands(
-            @Parameter(description = "Filter by active status") @RequestParam(required = false) Boolean active) {
-        if (active != null && active) {
-            return ResponseEntity.ok(brandService.getActiveBrands());
-        }
+    public ResponseEntity<List<BrandResponse>> getAllBrands() {
         return ResponseEntity.ok(brandService.getAllBrands());
     }
     

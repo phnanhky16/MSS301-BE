@@ -21,14 +21,6 @@ public class Category {
     @Column(nullable = false, unique = true)
     private String name;
     
-    private String description;
-    
-    @Column(name = "parent_id")
-    private Long parentId;
-    
-    @Column(nullable = false)
-    private Boolean active = true;
-    
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Product> products;
 }

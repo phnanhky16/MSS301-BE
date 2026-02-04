@@ -21,8 +21,6 @@ public class ProductResponse {
     private BigDecimal price;
     private CategoryResponse category;
     private BrandResponse brand;
-    private Integer stock;
-    private Boolean active;
     private List<String> imageUrls;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

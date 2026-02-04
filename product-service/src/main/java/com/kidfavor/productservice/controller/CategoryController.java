@@ -26,15 +26,11 @@ public class CategoryController {
     private final CategoryService categoryService;
     
     @GetMapping
-    @Operation(summary = "Get all categories", description = "Retrieve all categories or only active categories")
+    @Operation(summary = "Get all categories", description = "Retrieve all categories")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved categories")
     })
-    public ResponseEntity<List<CategoryResponse>> getAllCategories(
-            @Parameter(description = "Filter by active status") @RequestParam(required = false) Boolean active) {
-        if (active != null && active) {
-            return ResponseEntity.ok(categoryService.getActiveCategories());
-        }
+    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
     
@@ -49,16 +45,6 @@ public class CategoryController {
         return categoryService.getCategoryById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
-    
-    @GetMapping("/parent/{parentId}")
-    @Operation(summary = "Get subcategories", description = "Retrieve all subcategories of a parent category")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved subcategories")
-    })
-    public ResponseEntity<List<CategoryResponse>> getSubCategories(
-            @Parameter(description = "Parent category ID") @PathVariable Long parentId) {
-        return ResponseEntity.ok(categoryService.getSubCategories(parentId));
     }
     
     @PostMapping

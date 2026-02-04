@@ -29,9 +29,4 @@ public class ProductCreateRequest {
     
     @NotNull(message = "Brand ID is required")
     private Long brandId;
-    
-    @Min(value = 0, message = "Stock cannot be negative")
-    private Integer stock = 0;
-    
-    private Boolean active = true;
 }

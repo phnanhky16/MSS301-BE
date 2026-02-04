@@ -35,12 +35,6 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
-    public List<ProductResponse> getActiveProducts() {
-        List<Product> products = productRepository.findByActive(true);
-        return productMapper.toResponseList(products);
-    }
-    
-    @Override
     public Optional<ProductResponse> getProductById(Long id) {
         return productRepository.findById(id)
                 .map(productMapper::toResponse);
