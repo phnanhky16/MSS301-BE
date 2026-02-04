@@ -15,36 +15,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Shipment {
-    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
+    private Integer shipId;
+
+    private String street;
+    private String ward;
+    private String district;
+    private String city;
+    private Boolean status;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    
-    @Column(nullable = false)
-    private Long orderId; // Reference to Order in order-service
-    
-    @Column(nullable = false)
-    private String shippingAddress;
-    
-    private String trackingNumber;
-    
-    @Column(nullable = false)
-    private String status; // PENDING, SHIPPED, IN_TRANSIT, DELIVERED, CANCELLED
-    
-    private String carrier; // Shipping company
-    
-    private LocalDateTime shippedAt;
-    
-    private LocalDateTime deliveredAt;
-    
-    @CreationTimestamp
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-    
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 }
