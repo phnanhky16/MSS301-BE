@@ -22,8 +22,11 @@ import java.time.Duration;
 @EnableCaching
 public class RedisConfig {
 
-    @Bean
-    public ObjectMapper redisObjectMapper() {
+    /**
+     * ObjectMapper specifically for Redis serialization.
+     * NOT exposed as a Bean to avoid affecting HTTP JSON parsing.
+     */
+    private ObjectMapper createRedisObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.activateDefaultTyping(
@@ -46,7 +49,7 @@ public class RedisConfig {
 
         // JSON serializer for values
         GenericJackson2JsonRedisSerializer jsonSerializer =
-                new GenericJackson2JsonRedisSerializer(redisObjectMapper());
+                new GenericJackson2JsonRedisSerializer(createRedisObjectMapper());
 
         template.setKeySerializer(stringSerializer);
         template.setValueSerializer(jsonSerializer);
@@ -60,7 +63,7 @@ public class RedisConfig {
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
         GenericJackson2JsonRedisSerializer jsonSerializer =
-                new GenericJackson2JsonRedisSerializer(redisObjectMapper());
+                new GenericJackson2JsonRedisSerializer(createRedisObjectMapper());
 
         RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(10)) // Default TTL: 10 minutes

@@ -6,8 +6,8 @@ spring:
     name: api-gateway
   cloud:
     consul:
-      host: localhost
-      port: 8500
+      host: ${SPRING_CLOUD_CONSUL_HOST:localhost}
+      port: ${SPRING_CLOUD_CONSUL_PORT:8500}
       discovery:
         enabled: true
         register: true
@@ -27,6 +27,30 @@ spring:
             - Path=/api/users/**, /api/shipments/**
           filters:
             - StripPrefix=1
+
+        # User Service Auth Routes (Public)
+        - id: user-service-auth
+          uri: lb://user-service
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=1
+
+        # User Service Swagger API Docs
+        - id: user-service-api-docs
+          uri: lb://user-service
+          predicates:
+            - Path=/user-service/v3/api-docs, /user-service/v3/api-docs/**
+          filters:
+            - RewritePath=/user-service/(?<segment>.*), /${segment}
+
+        # User Service Swagger UI resources
+        - id: user-service-swagger-ui
+          uri: lb://user-service
+          predicates:
+            - Path=/user-service/swagger-ui/**, /user-service/swagger-ui.html
+          filters:
+            - RewritePath=/user-service/(?<segment>.*), /${segment}
         
         # Order Service Routes
         - id: order-service
@@ -68,6 +92,25 @@ spring:
           filters:
             - StripPrefix=1
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/kidfavor
+          jwk-set-uri: http://localhost:8180/realms/kidfavor/protocol/openid-connect/certs
+
+# Swagger/OpenAPI Configuration for Gateway aggregation
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /webjars/swagger-ui/index.html
+    urls:
+      - name: User Service
+        url: /user-service/v3/api-docs
+    urls-primary-name: User Service
+
 management:
   endpoints:
     web:
@@ -81,3 +124,4 @@ logging:
   level:
     org.springframework.cloud.gateway: DEBUG
     org.springframework.cloud.consul: DEBUG
+    org.springframework.security: DEBUG

@@ -86,4 +86,33 @@ public class UserServiceImpl implements UserService {
         user.setStatus(!user.getStatus());
         userRepository.save(user);
     }
+
+    @Override
+    @Transactional
+    @Caching(
+            put = @CachePut(value = "user", key = "#result.id"),
+            evict = {
+                    @CacheEvict(value = "users", allEntries = true)
+            }
+    )
+    public UserResponse changeUserRole(int id, Role role) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("user not found with id:" + id));
+        user.setRole(role);
+        return UserResponse.from(userRepository.save(user));
+    }
+
+    @Override
+    @Transactional
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "users", allEntries = true),
+                    @CacheEvict(value = "user", key = "#id")
+            }
+    )
+    public void deleteUser(int id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("user not found with id:" + id));
+        userRepository.delete(user);
+    }
 }

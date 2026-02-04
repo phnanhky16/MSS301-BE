@@ -3,6 +3,7 @@ package com.kidfavor.userservice.dto.response;
 import com.kidfavor.userservice.entity.User;
 import com.kidfavor.userservice.entity.enums.Role;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserResponse {

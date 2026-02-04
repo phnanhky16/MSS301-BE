@@ -15,5 +15,7 @@ public interface UserService {
     List<UserResponse> getUsersByRole(Role role);
     UserResponse updateUser(int id, UserUpdateRequest request);
     void changeUserStatus(int id);
+    UserResponse changeUserRole(int id, Role role);
+    void deleteUser(int id);
 
 }
