@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
-    private boolean success;
+    private int status;
     private String message;
     private T data;
     private String timestamp;
@@ -24,18 +24,26 @@ public class ApiResponse<T> {
     }
 
     public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(true, "Success", data, getCurrentTimestamp(), null);
+        return new ApiResponse<>(200, "Success", data, getCurrentTimestamp(), null);
     }
 
     public static <T> ApiResponse<T> success(String message, T data) {
-        return new ApiResponse<>(true, message, data, getCurrentTimestamp(), null);
+        return new ApiResponse<>(200, message, data, getCurrentTimestamp(), null);
+    }
+
+    public static <T> ApiResponse<T> success(int status, String message, T data) {
+        return new ApiResponse<>(status, message, data, getCurrentTimestamp(), null);
     }
 
     public static <T> ApiResponse<T> error(String message) {
-        return new ApiResponse<>(false, message, null, getCurrentTimestamp(), message);
+        return new ApiResponse<>(500, message, null, getCurrentTimestamp(), message);
     }
 
-    public static <T> ApiResponse<T> error(String message, String error) {
-        return new ApiResponse<>(false, message, null, getCurrentTimestamp(), error);
+    public static <T> ApiResponse<T> error(int status, String message) {
+        return new ApiResponse<>(status, message, null, getCurrentTimestamp(), message);
+    }
+
+    public static <T> ApiResponse<T> error(int status, String message, String error) {
+        return new ApiResponse<>(status, message, null, getCurrentTimestamp(), error);
     }
 }

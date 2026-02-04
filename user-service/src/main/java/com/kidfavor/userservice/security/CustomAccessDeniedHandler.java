@@ -30,6 +30,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
         ApiResponse<Object> apiResponse = ApiResponse.error(
+                403,
                 "Access denied. You don't have permission to access this resource.",
                 "Forbidden: " + accessDeniedException.getMessage()
         );

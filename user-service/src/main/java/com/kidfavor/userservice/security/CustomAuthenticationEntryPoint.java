@@ -30,6 +30,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         ApiResponse<Object> apiResponse = ApiResponse.error(
+                401,
                 "Authentication required. Please login to access this resource.",
                 "Unauthorized: " + authException.getMessage()
         );

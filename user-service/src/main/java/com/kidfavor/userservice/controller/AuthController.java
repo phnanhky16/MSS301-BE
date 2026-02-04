@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @Tag(name = "Authentication", description = "APIs for user authentication (Register, Login, Logout)")
+@io.swagger.v3.oas.annotations.security.SecurityRequirements // No security required for auth endpoints
 public class AuthController {
 
     private final AuthService authService;
@@ -45,7 +46,7 @@ public class AuthController {
             @Valid @RequestBody RegisterRequest request) {
         AuthResponse response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("User registered successfully", response));
+                .body(ApiResponse.success(201, "User registered successfully", response));
     }
 
     @Operation(
