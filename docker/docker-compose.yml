@@ -47,6 +47,59 @@ services:
       - microservices-network
     restart: on-failure
 
+  # --- Order Service ---
+  order-service:
+    build:
+      context: ../order-service
+      dockerfile: Dockerfile
+    container_name: order-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-order:5432/orderdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      PRODUCT_SERVICE_URL: http://product-service:8083
+    depends_on:
+      postgres-order:
+        condition: service_started
+      consul:
+        condition: service_started
+      kafka:
+        condition: service_started
+    networks:
+      - microservices-network
+    restart: on-failure
+
+  # --- Product Service ---
+  product-service:
+    build:
+      context: ../product-service
+      dockerfile: Dockerfile
+    container_name: product-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-product:5432/productdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_DRIVER: org.postgresql.Driver
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+      H2_CONSOLE_ENABLED: "false"
+    depends_on:
+      postgres-product:
+        condition: service_started
+      consul:
+        condition: service_started
+    networks:
+      - microservices-network
+    restart: on-failure
+
   # --- Service Discovery ---
   consul:
     image: hashicorp/consul:latest

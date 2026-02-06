@@ -1,5 +1,6 @@
 package com.kidfavor.productservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +22,13 @@ public class Category {
     @Column(nullable = false, unique = true)
     private String name;
     
+    @Column(length = 500)
+    private String description;
+    
+    @Column(nullable = false)
+    private Boolean active = true;
+    
+    @JsonIgnore
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Product> products;
 }

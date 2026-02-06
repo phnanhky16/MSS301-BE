@@ -1,6 +1,6 @@
 -- Create brands table
 CREATE TABLE brands (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
     description VARCHAR(255),
     logo_url VARCHAR(500),
@@ -9,7 +9,7 @@ CREATE TABLE brands (
 
 -- Create categories table
 CREATE TABLE categories (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
     description VARCHAR(255),
     parent_id BIGINT,
@@ -18,7 +18,7 @@ CREATE TABLE categories (
 
 -- Create products table
 CREATE TABLE products (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description VARCHAR(2000),
     price DECIMAL(19,2) NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE products (
 
 -- Create product_images table
 CREATE TABLE product_images (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     product_id BIGINT NOT NULL,
     image_url VARCHAR(500) NOT NULL,
     is_primary BOOLEAN NOT NULL DEFAULT FALSE,
@@ -44,7 +44,7 @@ CREATE TABLE product_images (
 
 -- Create packages table (if exists in your entity)
 CREATE TABLE packages (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     product_id BIGINT NOT NULL,
     name VARCHAR(255) NOT NULL,
     description VARCHAR(1000),

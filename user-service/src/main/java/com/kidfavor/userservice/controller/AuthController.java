@@ -2,6 +2,7 @@ package com.kidfavor.userservice.controller;
 
 import com.kidfavor.userservice.dto.ApiResponse;
 import com.kidfavor.userservice.dto.request.auth.LoginRequest;
+import com.kidfavor.userservice.dto.request.auth.LogoutRequest;
 import com.kidfavor.userservice.dto.request.auth.RefreshTokenRequest;
 import com.kidfavor.userservice.dto.request.auth.RegisterRequest;
 import com.kidfavor.userservice.dto.response.AuthResponse;
@@ -105,9 +106,8 @@ public class AuthController {
     })
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
-            @RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.substring(7); // Remove "Bearer " prefix
-        authService.logout(token);
+            @Valid @RequestBody LogoutRequest request) {
+        authService.logout(request.getToken());
         return ResponseEntity.ok(ApiResponse.success("Logout successful", null));
     }
 }

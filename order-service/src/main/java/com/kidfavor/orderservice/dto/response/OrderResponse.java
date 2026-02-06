@@ -1,0 +1,30 @@
+package com.kidfavor.orderservice.dto.response;
+
+import com.kidfavor.orderservice.entity.OrderStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class OrderResponse {
+
+    private Long id;
+    private String orderNumber;
+    private Long userId;
+    private OrderStatus status;
+    private BigDecimal totalAmount;
+    private String shippingAddress;
+    private String phoneNumber;
+    private String notes;
+    private List<OrderItemResponse> items;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
