@@ -1,5 +1,6 @@
 package com.kidfavor.inventoryservice.controller;
 
+import com.kidfavor.inventoryservice.dto.ApiResponse;
 import com.kidfavor.inventoryservice.dto.StockUpdateRequest;
 import com.kidfavor.inventoryservice.dto.StoreInventoryRequest;
 import com.kidfavor.inventoryservice.dto.StoreInventoryResponse;
@@ -24,57 +25,64 @@ public class StoreInventoryController {
 
     @GetMapping("/{storeId}/inventory")
     @Operation(summary = "Get all inventory in a store")
-    public ResponseEntity<List<StoreInventoryResponse>> getInventoryByStore(@PathVariable Long storeId) {
-        return ResponseEntity.ok(storeInventoryService.getInventoryByStore(storeId));
+    public ResponseEntity<ApiResponse<List<StoreInventoryResponse>>> getInventoryByStore(@PathVariable Long storeId) {
+        List<StoreInventoryResponse> inventory = storeInventoryService.getInventoryByStore(storeId);
+        return ResponseEntity.ok(ApiResponse.success("Retrieved store inventory successfully", inventory));
     }
 
     @GetMapping("/{storeId}/inventory/{productId}")
     @Operation(summary = "Get specific product inventory in a store")
-    public ResponseEntity<StoreInventoryResponse> getStoreInventory(
+    public ResponseEntity<ApiResponse<StoreInventoryResponse>> getStoreInventory(
             @PathVariable Long storeId,
             @PathVariable Long productId) {
-        return ResponseEntity.ok(storeInventoryService.getStoreInventory(storeId, productId));
+        StoreInventoryResponse inventory = storeInventoryService.getStoreInventory(storeId, productId);
+        return ResponseEntity.ok(ApiResponse.success("Inventory retrieved successfully", inventory));
     }
 
     @GetMapping("/{storeId}/inventory/{productId}/stock")
     @Operation(summary = "Get available stock for a product in store")
-    public ResponseEntity<Integer> getAvailableStock(
+    public ResponseEntity<ApiResponse<Integer>> getAvailableStock(
             @PathVariable Long storeId,
             @PathVariable Long productId) {
-        return ResponseEntity.ok(storeInventoryService.getAvailableStock(storeId, productId));
+        Integer stock = storeInventoryService.getAvailableStock(storeId, productId);
+        return ResponseEntity.ok(ApiResponse.success("Stock retrieved successfully", stock));
     }
 
     @GetMapping("/{storeId}/low-stock")
     @Operation(summary = "Get low stock products in a store")
-    public ResponseEntity<List<StoreInventoryResponse>> getLowStockProductsByStore(@PathVariable Long storeId) {
-        return ResponseEntity.ok(storeInventoryService.getLowStockProductsByStore(storeId));
+    public ResponseEntity<ApiResponse<List<StoreInventoryResponse>>> getLowStockProductsByStore(@PathVariable Long storeId) {
+        List<StoreInventoryResponse> products = storeInventoryService.getLowStockProductsByStore(storeId);
+        return ResponseEntity.ok(ApiResponse.success("Low stock products retrieved successfully", products));
     }
 
     @PostMapping("/{storeId}/inventory")
     @Operation(summary = "Add or update product inventory in store")
-    public ResponseEntity<StoreInventoryResponse> addOrUpdateInventory(
+    public ResponseEntity<ApiResponse<StoreInventoryResponse>> addOrUpdateInventory(
             @PathVariable Long storeId,
             @Valid @RequestBody StoreInventoryRequest request) {
         request.setStoreId(storeId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(storeInventoryService.addOrUpdateInventory(request));
+        StoreInventoryResponse inventory = storeInventoryService.addOrUpdateInventory(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.created("Inventory added/updated successfully", inventory));
     }
 
     @PutMapping("/{storeId}/inventory/{productId}")
     @Operation(summary = "Update stock quantity for a product in store")
-    public ResponseEntity<StoreInventoryResponse> updateStock(
+    public ResponseEntity<ApiResponse<StoreInventoryResponse>> updateStock(
             @PathVariable Long storeId,
             @PathVariable Long productId,
             @Valid @RequestBody StockUpdateRequest request) {
         request.setProductId(productId);
-        return ResponseEntity.ok(storeInventoryService.updateStock(storeId, request));
+        StoreInventoryResponse inventory = storeInventoryService.updateStock(storeId, request);
+        return ResponseEntity.ok(ApiResponse.success("Stock updated successfully", inventory));
     }
 
     @DeleteMapping("/{storeId}/inventory/{productId}")
     @Operation(summary = "Remove product from store inventory")
-    public ResponseEntity<Void> removeInventory(
+    public ResponseEntity<ApiResponse<Void>> removeInventory(
             @PathVariable Long storeId,
             @PathVariable Long productId) {
         storeInventoryService.removeInventory(storeId, productId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.success("Inventory removed successfully", null));
     }
 }

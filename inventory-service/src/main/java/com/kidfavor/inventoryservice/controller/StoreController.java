@@ -1,5 +1,6 @@
 package com.kidfavor.inventoryservice.controller;
 
+import com.kidfavor.inventoryservice.dto.ApiResponse;
 import com.kidfavor.inventoryservice.dto.StoreRequest;
 import com.kidfavor.inventoryservice.dto.StoreResponse;
 import com.kidfavor.inventoryservice.service.StoreService;
@@ -23,46 +24,53 @@ public class StoreController {
 
     @GetMapping
     @Operation(summary = "Get all stores")
-    public ResponseEntity<List<StoreResponse>> getAllStores() {
-        return ResponseEntity.ok(storeService.getAllStores());
+    public ResponseEntity<ApiResponse<List<StoreResponse>>> getAllStores() {
+        List<StoreResponse> stores = storeService.getAllStores();
+        return ResponseEntity.ok(ApiResponse.success("Retrieved all stores successfully", stores));
     }
 
     @GetMapping("/active")
     @Operation(summary = "Get all active stores")
-    public ResponseEntity<List<StoreResponse>> getActiveStores() {
-        return ResponseEntity.ok(storeService.getActiveStores());
+    public ResponseEntity<ApiResponse<List<StoreResponse>>> getActiveStores() {
+        List<StoreResponse> stores = storeService.getActiveStores();
+        return ResponseEntity.ok(ApiResponse.success("Retrieved active stores successfully", stores));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get store by ID")
-    public ResponseEntity<StoreResponse> getStoreById(@PathVariable Long id) {
-        return ResponseEntity.ok(storeService.getStoreById(id));
+    public ResponseEntity<ApiResponse<StoreResponse>> getStoreById(@PathVariable Long id) {
+        StoreResponse store = storeService.getStoreById(id);
+        return ResponseEntity.ok(ApiResponse.success("Store retrieved successfully", store));
     }
 
     @GetMapping("/code/{code}")
     @Operation(summary = "Get store by code")
-    public ResponseEntity<StoreResponse> getStoreByCode(@PathVariable String code) {
-        return ResponseEntity.ok(storeService.getStoreByCode(code));
+    public ResponseEntity<ApiResponse<StoreResponse>> getStoreByCode(@PathVariable String code) {
+        StoreResponse store = storeService.getStoreByCode(code);
+        return ResponseEntity.ok(ApiResponse.success("Store retrieved successfully", store));
     }
 
     @PostMapping
     @Operation(summary = "Create new store")
-    public ResponseEntity<StoreResponse> createStore(@Valid @RequestBody StoreRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(storeService.createStore(request));
+    public ResponseEntity<ApiResponse<StoreResponse>> createStore(@Valid @RequestBody StoreRequest request) {
+        StoreResponse store = storeService.createStore(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.created("Store created successfully", store));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update store")
-    public ResponseEntity<StoreResponse> updateStore(
+    public ResponseEntity<ApiResponse<StoreResponse>> updateStore(
             @PathVariable Long id,
             @Valid @RequestBody StoreRequest request) {
-        return ResponseEntity.ok(storeService.updateStore(id, request));
+        StoreResponse store = storeService.updateStore(id, request);
+        return ResponseEntity.ok(ApiResponse.success("Store updated successfully", store));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete store")
-    public ResponseEntity<Void> deleteStore(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteStore(@PathVariable Long id) {
         storeService.deleteStore(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.success("Store deleted successfully", null));
     }
 }

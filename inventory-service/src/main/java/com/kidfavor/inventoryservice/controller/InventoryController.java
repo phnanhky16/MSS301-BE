@@ -1,5 +1,6 @@
 package com.kidfavor.inventoryservice.controller;
 
+import com.kidfavor.inventoryservice.dto.ApiResponse;
 import com.kidfavor.inventoryservice.dto.StoreInventoryResponse;
 import com.kidfavor.inventoryservice.dto.WarehouseProductResponse;
 import com.kidfavor.inventoryservice.service.StoreInventoryService;
@@ -27,25 +28,25 @@ public class InventoryController {
 
     @GetMapping("/low-stock")
     @Operation(summary = "Get all low stock products across warehouses and stores")
-    public ResponseEntity<Map<String, Object>> getAllLowStockProducts() {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getAllLowStockProducts() {
         List<WarehouseProductResponse> warehouseLowStock = warehouseProductService.getLowStockProducts();
         List<StoreInventoryResponse> storeLowStock = storeInventoryService.getLowStockProducts();
         
-        Map<String, Object> response = new HashMap<>();
-        response.put("warehouses", warehouseLowStock);
-        response.put("stores", storeLowStock);
-        response.put("totalWarehouseProducts", warehouseLowStock.size());
-        response.put("totalStoreProducts", storeLowStock.size());
+        Map<String, Object> data = new HashMap<>();
+        data.put("warehouses", warehouseLowStock);
+        data.put("stores", storeLowStock);
+        data.put("totalWarehouseProducts", warehouseLowStock.size());
+        data.put("totalStoreProducts", storeLowStock.size());
         
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success("Low stock products retrieved successfully", data));
     }
 
     @GetMapping("/health")
     @Operation(summary = "Health check endpoint")
-    public ResponseEntity<Map<String, String>> healthCheck() {
-        Map<String, String> response = new HashMap<>();
-        response.put("status", "UP");
-        response.put("service", "inventory-service");
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<Map<String, String>>> healthCheck() {
+        Map<String, String> health = new HashMap<>();
+        health.put("status", "UP");
+        health.put("service", "inventory-service");
+        return ResponseEntity.ok(ApiResponse.success("Service is healthy", health));
     }
 }

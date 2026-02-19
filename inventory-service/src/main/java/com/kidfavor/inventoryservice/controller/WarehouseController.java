@@ -1,5 +1,6 @@
 package com.kidfavor.inventoryservice.controller;
 
+import com.kidfavor.inventoryservice.dto.ApiResponse;
 import com.kidfavor.inventoryservice.dto.WarehouseRequest;
 import com.kidfavor.inventoryservice.dto.WarehouseResponse;
 import com.kidfavor.inventoryservice.service.WarehouseService;
@@ -23,46 +24,53 @@ public class WarehouseController {
 
     @GetMapping
     @Operation(summary = "Get all warehouses")
-    public ResponseEntity<List<WarehouseResponse>> getAllWarehouses() {
-        return ResponseEntity.ok(warehouseService.getAllWarehouses());
+    public ResponseEntity<ApiResponse<List<WarehouseResponse>>> getAllWarehouses() {
+        List<WarehouseResponse> warehouses = warehouseService.getAllWarehouses();
+        return ResponseEntity.ok(ApiResponse.success("Retrieved all warehouses successfully", warehouses));
     }
 
     @GetMapping("/active")
     @Operation(summary = "Get all active warehouses")
-    public ResponseEntity<List<WarehouseResponse>> getActiveWarehouses() {
-        return ResponseEntity.ok(warehouseService.getActiveWarehouses());
+    public ResponseEntity<ApiResponse<List<WarehouseResponse>>> getActiveWarehouses() {
+        List<WarehouseResponse> warehouses = warehouseService.getActiveWarehouses();
+        return ResponseEntity.ok(ApiResponse.success("Retrieved active warehouses successfully", warehouses));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get warehouse by ID")
-    public ResponseEntity<WarehouseResponse> getWarehouseById(@PathVariable Long id) {
-        return ResponseEntity.ok(warehouseService.getWarehouseById(id));
+    public ResponseEntity<ApiResponse<WarehouseResponse>> getWarehouseById(@PathVariable Long id) {
+        WarehouseResponse warehouse = warehouseService.getWarehouseById(id);
+        return ResponseEntity.ok(ApiResponse.success("Warehouse retrieved successfully", warehouse));
     }
 
     @GetMapping("/code/{code}")
     @Operation(summary = "Get warehouse by code")
-    public ResponseEntity<WarehouseResponse> getWarehouseByCode(@PathVariable String code) {
-        return ResponseEntity.ok(warehouseService.getWarehouseByCode(code));
+    public ResponseEntity<ApiResponse<WarehouseResponse>> getWarehouseByCode(@PathVariable String code) {
+        WarehouseResponse warehouse = warehouseService.getWarehouseByCode(code);
+        return ResponseEntity.ok(ApiResponse.success("Warehouse retrieved successfully", warehouse));
     }
 
     @PostMapping
     @Operation(summary = "Create new warehouse")
-    public ResponseEntity<WarehouseResponse> createWarehouse(@Valid @RequestBody WarehouseRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(warehouseService.createWarehouse(request));
+    public ResponseEntity<ApiResponse<WarehouseResponse>> createWarehouse(@Valid @RequestBody WarehouseRequest request) {
+        WarehouseResponse warehouse = warehouseService.createWarehouse(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.created("Warehouse created successfully", warehouse));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update warehouse")
-    public ResponseEntity<WarehouseResponse> updateWarehouse(
+    public ResponseEntity<ApiResponse<WarehouseResponse>> updateWarehouse(
             @PathVariable Long id,
             @Valid @RequestBody WarehouseRequest request) {
-        return ResponseEntity.ok(warehouseService.updateWarehouse(id, request));
+        WarehouseResponse warehouse = warehouseService.updateWarehouse(id, request);
+        return ResponseEntity.ok(ApiResponse.success("Warehouse updated successfully", warehouse));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete warehouse")
-    public ResponseEntity<Void> deleteWarehouse(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteWarehouse(@PathVariable Long id) {
         warehouseService.deleteWarehouse(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.success("Warehouse deleted successfully", null));
     }
 }
