@@ -40,13 +40,4 @@ public class InventoryController {
         
         return ResponseEntity.ok(ApiResponse.success("Low stock products retrieved successfully", data));
     }
-
-    @GetMapping("/health")
-    @Operation(summary = "Health check endpoint")
-    public ResponseEntity<ApiResponse<Map<String, String>>> healthCheck() {
-        Map<String, String> health = new HashMap<>();
-        health.put("status", "UP");
-        health.put("service", "inventory-service");
-        return ResponseEntity.ok(ApiResponse.success("Service is healthy", health));
-    }
 }
