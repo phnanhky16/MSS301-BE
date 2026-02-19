@@ -3,6 +3,7 @@ package com.kidfavor.productservice.controller;
 import com.kidfavor.productservice.dto.ApiResponse;
 import com.kidfavor.productservice.dto.request.CategoryCreateRequest;
 import com.kidfavor.productservice.dto.request.CategoryUpdateRequest;
+import com.kidfavor.productservice.dto.request.StatusUpdateRequest;
 import com.kidfavor.productservice.dto.response.CategoryResponse;
 import com.kidfavor.productservice.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -81,8 +82,24 @@ public class CategoryController {
         );
     }
     
+    @PutMapping("/{id}/status")
+    @Operation(summary = "Update category status", description = "Change category status (ACTIVE, INACTIVE, DELETED)")
+    @ApiResponses(value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Category status updated successfully"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Category not found"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid status")
+    })
+    public ResponseEntity<ApiResponse<CategoryResponse>> updateCategoryStatus(
+            @Parameter(description = "Category ID") @PathVariable Long id,
+            @Valid @RequestBody StatusUpdateRequest request) {
+        CategoryResponse updated = categoryService.updateCategoryStatus(id, request);
+        return ResponseEntity.ok(
+            ApiResponse.success("Category status updated successfully", updated)
+        );
+    }
+    
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete category", description = "Delete a category by ID")
+    @Operation(summary = "Delete category", description = "Delete a category by ID (sets status to DELETED)")
     @ApiResponses(value = {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Category deleted successfully"),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Category not found")

@@ -40,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
     
     @Override
     public Optional<ProductResponse> getProductById(Long id) {
-        return productRepository.findByIdAndStatus(id, EntityStatus.ACTIVE)
+        return productRepository.findById(id)
                 .map(productMapper::toResponse);
     }
     

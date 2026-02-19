@@ -2,6 +2,7 @@ package com.kidfavor.productservice.service.impl;
 
 import com.kidfavor.productservice.dto.request.CategoryCreateRequest;
 import com.kidfavor.productservice.dto.request.CategoryUpdateRequest;
+import com.kidfavor.productservice.dto.request.StatusUpdateRequest;
 import com.kidfavor.productservice.dto.response.CategoryResponse;
 import com.kidfavor.productservice.entity.Category;
 import com.kidfavor.productservice.enums.EntityStatus;
@@ -36,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
     
     @Override
     public Optional<CategoryResponse> getCategoryById(Long id) {
-        return categoryRepository.findByIdAndStatus(id, EntityStatus.ACTIVE)
+        return categoryRepository.findById(id)
                 .map(categoryMapper::toResponse);
     }
     
@@ -79,5 +80,16 @@ public class CategoryServiceImpl implements CategoryService {
         category.setStatus(EntityStatus.DELETED);
         category.setStatusChangedAt(LocalDateTime.now());
         categoryRepository.save(category);
+    }
+    
+    @Override
+    public CategoryResponse updateCategoryStatus(Long id, StatusUpdateRequest request) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+        
+        category.setStatus(request.getStatus());
+        category.setStatusChangedAt(LocalDateTime.now());
+        Category updatedCategory = categoryRepository.save(category);
+        return categoryMapper.toResponse(updatedCategory);
     }
 }

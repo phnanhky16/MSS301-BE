@@ -3,6 +3,7 @@ package com.kidfavor.productservice.controller;
 import com.kidfavor.productservice.dto.ApiResponse;
 import com.kidfavor.productservice.dto.request.BrandCreateRequest;
 import com.kidfavor.productservice.dto.request.BrandUpdateRequest;
+import com.kidfavor.productservice.dto.request.StatusUpdateRequest;
 import com.kidfavor.productservice.dto.response.BrandResponse;
 import com.kidfavor.productservice.service.BrandService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -81,8 +82,24 @@ public class BrandController {
         );
     }
     
+    @PutMapping("/{id}/status")
+    @Operation(summary = "Update brand status", description = "Change brand status (ACTIVE, INACTIVE, DELETED)")
+    @ApiResponses(value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Brand status updated successfully"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Brand not found"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid status")
+    })
+    public ResponseEntity<ApiResponse<BrandResponse>> updateBrandStatus(
+            @Parameter(description = "Brand ID") @PathVariable Long id,
+            @Valid @RequestBody StatusUpdateRequest request) {
+        BrandResponse updated = brandService.updateBrandStatus(id, request);
+        return ResponseEntity.ok(
+            ApiResponse.success("Brand status updated successfully", updated)
+        );
+    }
+    
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete brand", description = "Delete a brand by ID")
+    @Operation(summary = "Delete brand", description = "Delete a brand by ID (sets status to DELETED)")
     @ApiResponses(value = {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Brand deleted successfully"),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Brand not found")

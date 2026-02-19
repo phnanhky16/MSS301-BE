@@ -2,6 +2,7 @@ package com.kidfavor.productservice.service.impl;
 
 import com.kidfavor.productservice.dto.request.BrandCreateRequest;
 import com.kidfavor.productservice.dto.request.BrandUpdateRequest;
+import com.kidfavor.productservice.dto.request.StatusUpdateRequest;
 import com.kidfavor.productservice.dto.response.BrandResponse;
 import com.kidfavor.productservice.entity.Brand;
 import com.kidfavor.productservice.enums.EntityStatus;
@@ -36,7 +37,7 @@ public class BrandServiceImpl implements BrandService {
     
     @Override
     public Optional<BrandResponse> getBrandById(Long id) {
-        return brandRepository.findByIdAndStatus(id, EntityStatus.ACTIVE)
+        return brandRepository.findById(id)
                 .map(brandMapper::toResponse);
     }
     
@@ -79,5 +80,16 @@ public class BrandServiceImpl implements BrandService {
         brand.setStatus(EntityStatus.DELETED);
         brand.setStatusChangedAt(LocalDateTime.now());
         brandRepository.save(brand);
+    }
+    
+    @Override
+    public BrandResponse updateBrandStatus(Long id, StatusUpdateRequest request) {
+        Brand brand = brandRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Brand not found with id: " + id));
+        
+        brand.setStatus(request.getStatus());
+        brand.setStatusChangedAt(LocalDateTime.now());
+        Brand updatedBrand = brandRepository.save(brand);
+        return brandMapper.toResponse(updatedBrand);
     }
 }
