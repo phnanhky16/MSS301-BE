@@ -4,13 +4,18 @@ import com.kidfavor.productservice.dto.request.BrandCreateRequest;
 import com.kidfavor.productservice.dto.request.BrandUpdateRequest;
 import com.kidfavor.productservice.dto.response.BrandResponse;
 import com.kidfavor.productservice.entity.Brand;
+import com.kidfavor.productservice.enums.EntityStatus;
+import com.kidfavor.productservice.exception.BadRequestException;
+import com.kidfavor.productservice.exception.ResourceNotFoundException;
 import com.kidfavor.productservice.mapper.BrandMapper;
 import com.kidfavor.productservice.repository.BrandRepository;
+import com.kidfavor.productservice.repository.ProductRepository;
 import com.kidfavor.productservice.service.BrandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +25,7 @@ import java.util.Optional;
 public class BrandServiceImpl implements BrandService {
     
     private final BrandRepository brandRepository;
+    private final ProductRepository productRepository;
     private final BrandMapper brandMapper;
     
     @Override
@@ -30,13 +36,13 @@ public class BrandServiceImpl implements BrandService {
     
     @Override
     public Optional<BrandResponse> getBrandById(Long id) {
-        return brandRepository.findById(id)
+        return brandRepository.findByIdAndStatus(id, EntityStatus.ACTIVE)
                 .map(brandMapper::toResponse);
     }
     
     @Override
     public Optional<BrandResponse> getBrandByName(String name) {
-        return brandRepository.findByName(name)
+        return brandRepository.findByNameAndStatus(name, EntityStatus.ACTIVE)
                 .map(brandMapper::toResponse);
     }
     
@@ -49,8 +55,8 @@ public class BrandServiceImpl implements BrandService {
     
     @Override
     public BrandResponse updateBrand(Long id, BrandUpdateRequest request) {
-        Brand brand = brandRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Brand not found with id: " + id));
+        Brand brand = brandRepository.findByIdAndStatus(id, EntityStatus.ACTIVE)
+                    .orElseThrow(() -> new ResourceNotFoundException("Brand not found with id: " + id));
         
         brandMapper.updateEntity(brand, request);
         Brand updatedBrand = brandRepository.save(brand);
@@ -59,6 +65,19 @@ public class BrandServiceImpl implements BrandService {
     
     @Override
     public void deleteBrand(Long id) {
-        brandRepository.deleteById(id);
+        Brand brand = brandRepository.findByIdAndStatus(id, EntityStatus.ACTIVE)
+                .orElseThrow(() -> new ResourceNotFoundException("Brand not found with id: " + id));
+        
+        // Validate: Check if brand has active products
+        long activeProductCount = productRepository.countByBrandAndStatus(brand, EntityStatus.ACTIVE);
+        if (activeProductCount > 0) {
+            throw new BadRequestException(
+                "Cannot delete brand. " + activeProductCount + " active product(s) are using this brand"
+            );
+        }
+        
+        brand.setStatus(EntityStatus.DELETED);
+        brand.setStatusChangedAt(LocalDateTime.now());
+        brandRepository.save(brand);
     }
 }

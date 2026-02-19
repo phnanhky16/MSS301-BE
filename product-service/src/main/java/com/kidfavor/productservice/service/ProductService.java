@@ -2,6 +2,7 @@ package com.kidfavor.productservice.service;
 
 import com.kidfavor.productservice.dto.request.ProductCreateRequest;
 import com.kidfavor.productservice.dto.request.ProductUpdateRequest;
+import com.kidfavor.productservice.dto.request.StatusUpdateRequest;
 import com.kidfavor.productservice.dto.response.ProductResponse;
 
 import java.util.List;
@@ -24,4 +25,6 @@ public interface ProductService {
     ProductResponse updateProduct(Long id, ProductUpdateRequest request);
     
     void deleteProduct(Long id);
+    
+    ProductResponse updateProductStatus(Long id, StatusUpdateRequest request);
 }
