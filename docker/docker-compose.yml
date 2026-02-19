@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # --- API Gateway ---
   api-gateway:
@@ -95,6 +93,33 @@ services:
       postgres-product:
         condition: service_started
       consul:
+        condition: service_started
+    networks:
+      - microservices-network
+    restart: on-failure
+
+  # --- Inventory Service ---
+  inventory-service:
+    build:
+      context: ../inventory-service
+      dockerfile: Dockerfile
+    container_name: inventory-service
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-inventory:5432/inventorydb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      PRODUCT_SERVICE_URL: http://product-service:8083
+    depends_on:
+      postgres-inventory:
+        condition: service_started
+      consul:
+        condition: service_started
+      kafka:
         condition: service_started
     networks:
       - microservices-network
