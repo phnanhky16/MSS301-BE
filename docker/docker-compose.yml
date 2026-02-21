@@ -1,3 +1,4 @@
+
 services:
   # --- API Gateway ---
   api-gateway:
@@ -34,12 +35,15 @@ services:
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_CLOUD_CONSUL_HOST: consul
       SPRING_CLOUD_CONSUL_PORT: 8500
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
       postgres-user:
         condition: service_healthy
       redis:
         condition: service_started
       consul:
+        condition: service_started
+      kafka:
         condition: service_started
     networks:
       - microservices-network
@@ -98,6 +102,7 @@ services:
       - microservices-network
     restart: on-failure
 
+
   # --- Inventory Service ---
   inventory-service:
     build:
@@ -117,6 +122,23 @@ services:
     depends_on:
       postgres-inventory:
         condition: service_started
+
+  # --- Notification Service ---
+  notification-service:
+    build:
+      context: ..
+      dockerfile: notification-service/Dockerfile
+    container_name: notification-service
+    ports:
+      - "8086:8086"
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+      MAIL_USERNAME: ${MAIL_USERNAME:-testpersonality134@gmail.com}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-qhjj mrhl yyba gfly}
+    depends_on:
+
       consul:
         condition: service_started
       kafka:
