@@ -62,3 +62,8 @@ cd review-service && mvn spring-boot:run
 ### Service Discovery:
 
 All services register with Consul at `localhost:8500`
+if any service's pom.xml, simply add (no version needed — managed by the root POM):
+<dependency>
+    <groupId>com.kidfavor</groupId>
+    <artifactId>common-library</artifactId>
+</dependency>

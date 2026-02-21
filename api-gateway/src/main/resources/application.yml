@@ -51,7 +51,7 @@ spring:
             - Path=/user-service/swagger-ui/**, /user-service/swagger-ui.html
           filters:
             - RewritePath=/user-service/(?<segment>.*), /${segment}
-        
+
         # Order Service Routes
         - id: order-service
           uri: lb://order-service

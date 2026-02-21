@@ -12,9 +12,13 @@ import org.springframework.context.ApplicationEvent;
 public class OrderCreatedDomainEvent extends ApplicationEvent {
 
     private final Order order;
+    private final String customerEmail;
+    private final String customerName;
 
-    public OrderCreatedDomainEvent(Object source, Order order) {
+    public OrderCreatedDomainEvent(Object source, Order order, String customerEmail, String customerName) {
         super(source);
         this.order = order;
+        this.customerEmail = customerEmail;
+        this.customerName = customerName;
     }
 }

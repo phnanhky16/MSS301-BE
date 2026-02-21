@@ -51,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
         log.info("Creating order for user: {}", request.getUserId());
 
         // Step 1: Validate user exists and is active
-        validateUser(request.getUserId());
+        UserDto user = validateUser(request.getUserId());
 
         // Step 2: Validate all products BEFORE creating the order
         Map<Long, ProductDto> validatedProducts = validateAndFetchProducts(request.getItems());
@@ -91,7 +91,10 @@ public class OrderServiceImpl implements OrderService {
                 savedOrder.getId(), savedOrder.getOrderNumber());
 
         // Step 6: Publish domain event (will be sent to Kafka AFTER_COMMIT)
-        eventPublisher.publishEvent(new OrderCreatedDomainEvent(this, savedOrder));
+        String customerEmail = user.getEmail();
+        String customerName = user.getFullName() != null ? user.getFullName()
+                : (user.getFirstName() != null ? user.getFirstName() + " " + user.getLastName() : user.getUsername());
+        eventPublisher.publishEvent(new OrderCreatedDomainEvent(this, savedOrder, customerEmail, customerName));
 
         return mapToOrderResponse(savedOrder);
     }
@@ -232,30 +235,28 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * Validates that the user exists and is active.
+     * Validates that the user exists and is active. Returns the fetched UserDto.
      * Throws UserNotFoundException if user doesn't exist.
      * Throws UserServiceUnavailableException if User Service is down.
      * Throws UserInactiveException if user is inactive.
      */
-    private void validateUser(Long userId) {
+    private UserDto validateUser(Long userId) {
         log.debug("Validating user: {}", userId);
-        
-        // UserServiceClient sẽ throw exception nếu:
-        // - User Service không available -> UserServiceUnavailableException
-        // - User không tồn tại -> UserNotFoundException (từ ErrorDecoder/Fallback)
         UserDto user = userServiceClient.getUserById(userId);
-        
-        // Null check phòng trường hợp response rỗng
+
         if (user == null) {
             throw new UserNotFoundException(userId);
         }
 
-        // Validate user is active
-        if (user.getIsActive() == null || !user.getIsActive()) {
+        // Support both isActive and status fields from different UserResponse shapes
+        boolean active = (user.getIsActive() != null && user.getIsActive())
+                || (user.getStatus() != null && user.getStatus());
+        if (!active) {
             throw new UserInactiveException(userId);
         }
-        
+
         log.debug("User validated successfully: {}", userId);
+        return user;
     }
 
     /**
